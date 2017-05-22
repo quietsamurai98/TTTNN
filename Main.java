@@ -21,17 +21,24 @@ public class Main {
     public static void main(String[] args) {
         // TODO code application logic here
         int[] layerCounts = {9,18,18,18,9};
-        Network nn = new Network(layerCounts);
-        Evolver darwin = new Evolver(25, 1, 0.5, 250);
-        
+        Network xNN = new Network(layerCounts);
+        Network oNN = new Network(layerCounts);
+        Evolver xTrainer = new Evolver(50, 1, 0.5, 1, 1);
+        Evolver oTrainer = new Evolver(50, 1, 0.5, 1, 1);
         //nn = darwin.evolve(nn, 1000);
         
         Scanner kb = new Scanner(System.in);
-		System.out.println("Training... please wait.");
-		nn = darwin.evolve(nn, 100);
+		System.out.println("Training O, please wait.");
+		oNN = xTrainer.evolve(oNN, xNN, 500);
+		System.out.println("Training X, please wait.");
+		xNN = xTrainer.evolve(xNN, oNN, 500);
+		System.out.println("Training O, please wait.");
+		oNN = xTrainer.evolve(oNN, xNN, 500);
+		System.out.println("Training X, please wait.");
+		xNN = xTrainer.evolve(xNN, oNN, 500);
         while(true){
-        	System.out.println(nn);
-        	System.out.println("Current fitness: " + darwin.calcFitness(nn));
+        	//System.out.println(nn);
+        	System.out.println("Current fitness: " + xTrainer.calcFitness(xNN, oNN));
         	System.out.println("Play a game, then train for 100 generations.");
         	System.out.println("You are playing as O. Enter a number 0-8 to put an O at that tile.");
         	System.out.println("Tile Reference:\n012\n345\n678\n");
@@ -47,7 +54,7 @@ public class Main {
 	        			inputs[j] = (double) gameBoard[j/3][j%3];
 	        		}
 					Double[][] output = new Double[9][2];
-	        		double[] nnout = nn.calc(inputs);
+	        		double[] nnout = xNN.calc(inputs);
 	        		for(int j = 0; j < 9; j++){
 	        			output[j][0] = new Double(nnout[j]);
 	        			output[j][1] = new Double(j);
@@ -64,9 +71,12 @@ public class Main {
 	        	System.out.println(game);
 	        	side*=-1;
 	        }
-			System.out.println("Training... please wait.");
-			darwin.halveLearningRate();
-			nn = darwin.evolve(nn, 100);
+			oTrainer.multiplyLearningRate(0.5);
+			System.out.println("Training O, please wait.");
+			oNN = xTrainer.evolve(oNN, xNN, 1000);
+			xTrainer.multiplyLearningRate(0.5);
+			System.out.println("Training X, please wait.");
+			xNN = xTrainer.evolve(xNN, oNN, 1000);
         }
     }
     
