@@ -8,6 +8,7 @@
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.ArrayList;
 
 public class Evolver {
 	int	   populationSize;
@@ -111,10 +112,15 @@ public class Evolver {
     }
     public void nnMakeMove(Network network, int side, TTTGame game){
     	double[] inputs = genInputs(game);
-		Double[][] output = sortOutputs(network.calc(inputs));
-		Arrays.sort(output, comparator);
-		for(int j = 0; j<9 && !game.makeMove(side, output[j][1].intValue()); j++){
+		ArrayList<Integer> outputList = sortOutputsList(network.calc(inputs));
+		boolean flag = false;
+		for(int j = 0; (!flag) && j<9; j++){
+			flag = game.makeMove(side, outputList.get(j)); //Make the best move that is valid
 		}
+		
+		//Old way of sorting and moving is below. It is /very/ slow.
+		//Double[][] output = sortOutputs(network.calc(inputs));
+		//for(int j = 0; j<9 && !game.makeMove(side, output[j][1].intValue()); j++){} //Make the most fit move that is valid
     }
     public double[] genInputs(TTTGame game){
     	double[] inputs = new double[18];
@@ -131,7 +137,30 @@ public class Evolver {
 			output[j][0] = nnout[j];
 			output[j][1] = (double) j;
 		}
+		Arrays.sort(output, comparator);
 		return output;
+    }
+    public ArrayList<Integer> sortOutputsList(double[] nnout){
+    	ArrayList<Integer> moves = new ArrayList<Integer>();
+    	ArrayList<Double> values = new ArrayList<Double>();
+    	moves.add(0);
+    	values.add(nnout[0]);
+    	int l = 1;
+    	for(int i = 1; i < 9; i++){
+    		for(int j = 0; j < i && i==l; j++){
+    			if(values.get(j)<nnout[i]){
+    				values.add(j, nnout[i]);
+    				moves.add(j, i);
+    				l++;
+    			}
+    		}
+    		if(i==l){
+    			values.add(nnout[i]);
+				moves.add(i);
+				l++;
+    		}
+    	}
+    	return moves;
     }
     public void halveLearningRate(){
     	maxWeightChange/=2.0;

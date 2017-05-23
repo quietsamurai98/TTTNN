@@ -19,12 +19,11 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
         int[] numpadToTile = {-1,6,7,8,3,4,5,0,1,2};
         int epoch = 100;
-        int[] layerCounts = {18,18,18,9,9,9};
+        int[] layerCounts = {18,36,36,18,9,9};
         Network nn = new Network(layerCounts);
-        Evolver darwin = new Evolver(25, 1, 0.5, 1000);
+        Evolver darwin = new Evolver(25, 1, 0.5, 500);
         
         //nn = darwin.evolve(nn, 1000);
         

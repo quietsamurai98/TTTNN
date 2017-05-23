@@ -15,7 +15,7 @@ public class TTTGame {
     public boolean makeMove(int side, int tile){
     	if (gameBoard[tile/3][tile%3] == 0){
     		gameBoard[tile/3][tile%3] = side;
-    		return true;
+    		return true; //legal move returns true
     	}
     	return false;
     }
