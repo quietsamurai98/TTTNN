@@ -91,7 +91,7 @@ public class TTTGame {
 	    	if(board[0][c] == side && board[2][c] == side && board[1][c] == 0)
 	    		moves.add(3+c);
 	    	if(board[0][c] == side && board[1][c] == side && board[2][c] == 0)
-	    		moves.add(6+2);
+	    		moves.add(6+c);
     	}
     	if(board[1][1] == side && board[2][2] == side && board[0][0] == 0)
     		moves.add(0);
@@ -123,7 +123,7 @@ public class TTTGame {
 	    	if(board[0][c] == side && board[2][c] == side && board[1][c] == 0)
 	    		moves.add(3+c);
 	    	if(board[0][c] == side && board[1][c] == side && board[2][c] == 0)
-	    		moves.add(6+2);
+	    		moves.add(6+c);
     	}
     	if(board[1][1] == side && board[2][2] == side && board[0][0] == 0)
     		moves.add(0);
