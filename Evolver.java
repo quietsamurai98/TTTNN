@@ -14,6 +14,7 @@ public class Evolver {
 	double maxWeightChange;
 	double funcMutateProb;
 	int numTests;
+	ArrayComparator comparator = new ArrayComparator(0, false);
 	
 	
     public Evolver(int populationSize, double maxWeightChange, double funcMutateProb, int numTests){
@@ -50,9 +51,9 @@ public class Evolver {
     
     public Network findMostFit(Network population[]){
     	int index = 0;
-    	double maxFitness = calcFitness(population[0]);
+    	double maxFitness = calcFitness(population[0])[0];
     	for(int i=1; i<populationSize; i++){
-    		double fitness = calcFitness(population[i]);
+    		double fitness = calcFitness(population[i])[0];
     		if(fitness>maxFitness){
     			maxFitness = fitness;
     			index = i;
@@ -67,39 +68,70 @@ public class Evolver {
     	return population[index];
     }
     
-    public double calcFitness(Network network){
+    public double[] calcFitness(Network network){
     	double avgFitness = 0.0;
+    	double xWins = 0.0;
+    	double oWins = 0.0;
+    	double ties  = 0.0;
 		for(int i = 0; i<numTests; i++){
-			TTTGame game = new TTTGame();
-	        int side = 1;
-	        int move = 0;
-	        while(!game.isGameOver()){
-	        	if(side == 1){ //NN turn
-	        		double[] inputs = new double[9];
-	        		int[][] gameBoard = game.getBoard();
-	        		for(int j = 0; j < 9; j++){
-	        			inputs[j] = (double) gameBoard[j/3][j%3];
-	        		}
-					Double[][] output = new Double[9][2];
-	        		double[] nnout = network.calc(inputs);
-	        		for(int j = 0; j < 9; j++){
-	        			output[j][0] = new Double(nnout[j]);
-	        			output[j][1] = new Double(j);
-	        		}
-	        		Arrays.sort(output, new ArrayComparator(0, false));
-	        		for(int j = 0; j<9 && !game.makeMove(side, output[j][1].intValue()); j++){
-	        		}
-	        	} else {
-	        		move = (int) (Math.random()*9);
-		        	while(!game.makeMove(side, move)){
-		        		move = (int) (Math.random()*9);
-		        	}
-	        	}
-	        	side*=-1;
-	        }
-	        avgFitness+=game.getWinner();
+			int winner = playGame(network);
+			switch(winner){
+        	case -1:
+        		avgFitness -= 1.0;
+        		oWins+=1.0;
+        		break;
+        	case 0:
+        		avgFitness += 0.0;
+        		ties+=1.0;
+        		break;
+        	case 1:
+        		avgFitness += 1.0;
+        		xWins+=1.0;
+        		break;
+        	}
+        	//Wins are worth 1, ties are worth 0, losses are -1
 		}
-    	return avgFitness;
+		double[] out = {avgFitness, xWins, oWins, ties};
+    	return out;
+    }
+    
+    public int playGame(Network network){
+    	TTTGame game = new TTTGame();
+        int side = 1;
+        int move = 0;
+        while(!game.isGameOver()){
+        	if(side == 1){ //NN turn
+        		nnMakeMove(network, 1, game);
+        	} else {
+        		game.makeMove(-1, game.noPlanAI(-1, game.getBoard()));
+        	}
+        	side*=-1;
+        }
+        return game.getWinner();        
+    }
+    public void nnMakeMove(Network network, int side, TTTGame game){
+    	double[] inputs = genInputs(game);
+		Double[][] output = sortOutputs(network.calc(inputs));
+		Arrays.sort(output, comparator);
+		for(int j = 0; j<9 && !game.makeMove(side, output[j][1].intValue()); j++){
+		}
+    }
+    public double[] genInputs(TTTGame game){
+    	double[] inputs = new double[18];
+		int[][] gameBoard = game.getBoard();
+		for(int j = 0; j < 9; j++){
+			inputs[j] = ((gameBoard[j/3][j%3] == 1) ? 1.0 : 0.0); //Tile is occupied by X
+			inputs[j+9]=((gameBoard[j/3][j%3] ==-1) ? 1.0 : 0.0); //Tile is occupied by O
+		}
+		return inputs;
+    }
+    public Double[][] sortOutputs(double[] nnout){
+    	Double[][] output = new Double[9][2];
+		for(int j = 0; j < 9; j++){
+			output[j][0] = nnout[j];
+			output[j][1] = (double) j;
+		}
+		return output;
     }
     public void halveLearningRate(){
     	maxWeightChange/=2.0;

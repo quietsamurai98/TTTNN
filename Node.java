@@ -66,7 +66,8 @@ public class Node {
     	return sum;
     }
     private double activationFunc(double sum){ //Applys activation function to sum
-    	return activeFunc[activeFuncID].f(sum); //Activation function is sigmoid
+    	return (1.0 / (1.0 + Math.exp(-sum))); //Sigmoid
+    	//return activeFunc[activeFuncID].f(sum);
     }
     public int getActivationFunc(){
     	return activeFuncID;
@@ -98,28 +99,27 @@ public class Node {
     			return (1.0 / (1.0 + Math.exp(-x))); //Sigmoid, index 0
     		}
     	}
-    	,new ActivationFunction(){
-    		public double f(double x){
-    			return x; //Identity, index 1
-    		}
-    	}
-    	,new ActivationFunction(){
-    		public double f(double x){
-    			return Math.tanh(x); //Tanh, index 2
-    		}
-    	}
+//    	,new ActivationFunction(){
+//    		public double f(double x){
+//    			return x; //Identity, index 1
+//    		}
+//    	}
+//    	,new ActivationFunction(){
+//    		public double f(double x){
+//    			return Math.tanh(x); //Tanh, index 2
+//    		}
+//    	}
 //    	,new ActivationFunction(){
 //    		public double f(double x){
 //    			return (x>0) ? x : 0; //ReLU, index 3
 //    		}
-//    	},
-
-//    	new ActivationFunction(){
+//    	}
+//    	,new ActivationFunction(){
 //    		public double f(double x){
 //    			return Math.signum(x); //Sign, index 4
 //    		}
-//    	},
-//    	new ActivationFunction(){
+//    	}
+//    	,new ActivationFunction(){
 //    		public double f(double x){
 //    			return (x>0) ? 1.0 : 0.0; //Step, index 5
 //    		}
