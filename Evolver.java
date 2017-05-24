@@ -78,7 +78,7 @@ public class Evolver {
 			int winner = playGame(network);
 			switch(winner){
         	case -1:
-        		avgFitness -= 5.0;
+        		avgFitness -= 10.0;
         		oWins+=1.0;
         		break;
         	case 0:
@@ -86,7 +86,7 @@ public class Evolver {
         		ties+=1.0;
         		break;
         	case 1:
-        		avgFitness += 2.0;
+        		avgFitness += 3.0;
         		xWins+=1.0;
         		break;
         	}

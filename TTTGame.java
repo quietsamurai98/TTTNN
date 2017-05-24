@@ -106,6 +106,13 @@ public class TTTGame {
     	if(board[2][0] == side && board[1][1] == side && board[0][2] == 0)
     		moves.add(2);
     	if(moves.size()>0){
+    		if(Math.random()<0.25){ //Make a mistake sometimes.
+	    		int i = (int)(Math.random()*9);
+	    		while(board[i/3][i%3]!=0){
+	    			i = (int)(Math.random()*9);
+	    		}
+	    		moves.add(i);
+	    	}
     		return moves.get((int)(Math.random()*moves.size())); //win
     	}
     	side*=-1;
@@ -138,6 +145,13 @@ public class TTTGame {
     	if(board[2][0] == side && board[1][1] == side && board[0][2] == 0)
     		moves.add(2);
     	if(moves.size()>0){
+    		if(Math.random()<0.25){ //Make a mistake sometimes.
+	    		int i = (int)(Math.random()*9);
+	    		while(board[i/3][i%3]!=0){
+	    			i = (int)(Math.random()*9);
+	    		}
+	    		moves.add(i);
+	    	}
     		return moves.get((int)(Math.random()*moves.size())); //block opponent from winning
     	}
     	
